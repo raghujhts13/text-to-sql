@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Llama SQL Generator</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style/output.css') }}">
+        <link href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css" rel="stylesheet">
+        <!--Responsive Extension Datatables CSS-->
+        <link href="https://cdn.datatables.net/responsive/2.2.3/css/responsive.dataTables.min.css" rel="stylesheet">
+    </head>
+    <body>
+        <div class="p-2 grid gap-4 grid-cols-10">
+            <div class="col-start-3 col-end-8 block rounded-lg bg-white text-center shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] dark:bg-neutral-700">
+                <div class="border-b-2 border-neutral-100 px-6 py-3 dark:border-neutral-600 dark:text-neutral-50">
+                    SQL SERVER QUERY
+                </div>
+                <div class="bg-gradient-to-r from-rose-50 via-pink-100 via-fuchsia-100 to-purple-100 p-6 shadow-md p-6">
+                    <h5 class="text-left mb-1 text-sm font-small leading-tight text-purple-800">
+                    {{db_data}}
+                    </h5>
+                </div>
+                <div class="grid gap-2 grid-cols-4 items-center justify-between border-t-2 border-neutral-100 py-2">
+                    <a href="#" class="col-start-1 col-end-2 block text-xs bg-white hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
+                        <h5 class="mb-1 text-xs font-bold tracking-tight text-teal-400 dark:text-white">Tokens Utilized : {{gpt_metadata['tokens']}}</h5>
+                    </a>
+                    <a href="#" class="col-start-4 col-end-5 block text-xs bg-white hover:bg-gray-100 hover:border-gray-700">
+                        <h5 class="mb-1 text-xs font-bold tracking-tight text-emerald-400 dark:text-white">Time Taken (ms) : {{gpt_metadata['time_taken']}}</h5>
+                    </a>
+                </div>
+            </div>
+            <div class="text-xs col-start-8 col-end-11 flex justify-center items-center">
+                <div class="max-w-sm p-4 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+                    <p class="py-2">
+                        <span class="text-stone-400">
+                            For <span class="underline decoration-orange-200">
+                                viewing and primitive search capabilities
+                            </span> the below table should be fine.<br>
+                        </span>
+                        <span class="text-orange-300">
+                            For <span class="underline decoration-yellow-300">
+                                visualization and bit more advanced data handling
+                            </span> click the below button.<br>
+                        </span><br>
+                        <span class="group relative ">
+                            <button id="chartbutton" class="justify-center bg-blue-500 text-white font-bold px-1 border-b-4 border-blue-700 rounded">
+                                <p class="text-stone-100 hover:text-slate-900">PyGWalker</p>
+                            </button><br>
+                            <span class="hidden font-semibold text-emerald-500 subpixel-antialiased group-hover:block transition-transform"> Watch out for a new tab </span>
+                        </span>
+                    </p>
+                </div>
+            </div>
+            <div class="col-start-1 col-end-12 container mx-auto px-1">
+                <div id='recipients' class="text-xs p-1 mt-1 lg:mt-0 rounded bg-white">
+                    <table id="example" class="stripe hover table-fixed table-w-200 text-xs" style="width:100%;" >
+                        <thead class="text-xs">
+                            <tr>
+                                {% for i in output.keys() %}
+                                <th data-priority={{ loop.index }}>{{ i }}</th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody class="text-xs text-center">
+                            {% for i in positions %}
+                            <tr>
+                                {% for j in output.values() %}
+                                <td>{{ j[i] }}</td>
+                                {% endfor %}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.2.3/js/dataTables.responsive.min.js"></script>
+    <script>
+		$(document).ready(function() {
+
+			var table = $('#example').DataTable({
+                "autoWidth": false, // Disable auto width
+                "scrollX": true,    // Enable horizontal scrolling
+                "columnDefs": [
+                        { "width": "100px", "targets": "_all" } // Set maximum width for columns
+                    ]
+				})
+                columns.adjust()
+                .responsive.recalc();
+        });
+	</script>
+    <!-- Handling the PyGWalker Render -->
+    <script>
+        function openNewTab(htmlContent) {
+        const newTab = window.open('', '_blank');
+        newTab.document.open();
+        newTab.document.write(htmlContent);
+        newTab.document.close();
+        }
+        const openModalButton = document.getElementById('chartbutton');
+
+        openModalButton.addEventListener('click', async () => {
+          try {
+                const response = await fetch('/render_dashboard');
+                const htmlString = await response.text();
+                openNewTab(htmlString);
+            } catch (error) {
+                console.error('Error fetching HTML:', error);
+            }
+        });
+    </script>
+    </body> 
+</html>

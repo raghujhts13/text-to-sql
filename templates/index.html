@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Llama SQL Generator</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    </head>
+    <style>
+        .clock{
+            border: 2px;
+            background-color: #0D0208;
+            color: #00FF41;
+            padding: 1px;
+            border-radius: 5px;
+        }
+        input:focus {
+            outline: none; /* Remove the outline when input is focused */
+        }
+    </style>
+    <body>
+        <div id="app">
+            <div class="grid gap-4 grid-cols-8">
+                <div class="clock absolute top-0 right-0 m-4 text-xl font-bold">
+                    <span id="clock"></span>
+                </div><br>
+                <div class="col-start-2 col-end-8">
+                    <label class="text-gray-700 text-sm font-bold mb-2" for="textarea">
+                      &nbsp;&nbsp;SQL Server Query Generator
+                    </label>
+                    <textarea id="prompt" class="w-full border border-gray-300 p-2 rounded-md focus:outline-none focus:border-blue-500 text-left text-sm" 
+                    placeholder="Request data from the below tables" style="font-size: 10px !important; font-weight: bold;" rows="4">
+                    </textarea>
+                    <div class="p-4">
+                        <label class="block font-medium text-gray-700">Temperature Controller</label>
+                        <input
+                          type="range"
+                          min="0"
+                          max="1"
+                          step="0.1"
+                          class="w-full mt-2 appearance-none bg-gray-300 h-1 rounded-lg focus:outline-none focus:bg-blue-400"
+                        >
+                        <p class="mt-2 text-sm text-gray-600">Value: <span id="sliderValue">0.5</span></p>
+                      </div>
+                    <div class="flex items-center justify-between p-2">
+                        <button id="request-query" class="flex bg-green-800 text-white px-1 py-1 rounded-md text-xs hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-blue-300">
+                            <img width="14" height="14" src="https://img.icons8.com/arcade/64/process.png" alt="process"/>
+                            Generate
+                        </button>
+                        <button id="execute-query" class=" hidden flex bg-emerald-500 text-white px-1 py-1 rounded-md text-xs hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-blue-300">
+                            <img width="14" height="14" src="https://img.icons8.com/color/48/ok--v1.png" alt="ok--v1"/>
+                            Execute
+                        </button>
+                        <button class="flex text-xs bg-sky-500 text-white rounded-md px-1 py-1 text-base font-medium hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-green-300" id="openModalButton">
+                            <img width="14" height="14" src="https://img.icons8.com/fluency/48/database--v1.png" alt="database--v1"/>
+                            Connection
+                        </button>
+                        <button id="clear-prompt" class="flex bg-amber-500 text-white px-1 py-1 rounded-md text-xs hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-300">
+                            <img width="14" height="14" src="https://img.icons8.com/color/48/broom.png" alt="broom"/>
+                            Clear
+                        </button>
+                        <button id="reset-prompt" class="hidden flex bg-red-800 text-white px-1 py-1 rounded-md text-xs hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-amber-300">
+                            <img width="14" height="14" src="https://img.icons8.com/fluency/48/synchronize.png" alt="synchronize"/>
+                            Reset
+                        </button>
+                    </div>                      
+                </div>
+                <div class="col-start-2 col-end-8">
+                    <div class="col-start-2 col-end-8 p-4 w-full">
+                        <input id="filterInput" class="col-start-2 col-end-8 p-4 w-full" type="text" placeholder="Search schema and tables">
+                      </div>
+                        <table id="database_schema" class="text-xs table-fixed text-sm w-full border-collapse border border-slate-100">
+                        <caption class="caption-top">
+                            List of all available base tables in the database
+                        </caption>
+                        <thead>
+                            <th class="w-1/4 p-2 text-center border border-slate-300">Table</th>
+                            <th class="w-1/6 p-2 text-center border border-slate-300">Schema</th>
+                            <th class="w-1/2 p-2 text-center border border-slate-300">Column</th>
+                            <!-- <th class="p-2 text-center border border-slate-300">Datatype</th> -->
+                            <th class="p-2 text-center border border-slate-300">Selected</th>
+                        </thead>
+                        <tbody id="tableBody">
+                                {% for keys,values in json_data.items() %}
+                                    <tr>
+                                        <td class="p-2 text-left border border-slate-300">{{ keys }}</td>
+                                        <td class="p-2 text-center border border-slate-300">{{values[0]['schema']}}</td>
+                                        <td class="p-2 max-h-10 overflow-y-auto border border-slate-300">{{values[0]['name']}}</td>
+                                        <!-- <td class="p-2 max-h-10 overflow-y-auto border border-slate-300">{{values[0]['dtypes']}}</td> -->
+                                        <td class="p-2 text-center border border-slate-300">
+                                            <label>
+                                                <input type="checkbox" class="checkbox accent-orange-500/50" checked>
+                                            </label>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                            </tbody>
+                        </table>
+                </div>
+            </div>
+        </div>
+        <!-- MODAL -->
+        <div id="myModal" class="hidden fixed inset-0 flex items-center justify-center z-50">
+            <div class="p-4 rounded-md shadow-lg bg-lime-200">
+                <h2 class="text-md font-semibold mb-2">Connection Parameters</h2>
+                <div class="text-xs">
+                    <!-- <label for="small-input" class="block mb-2 text-xs text-gray-900 dark:text-white">Small input</label>
+                    <input type="text" id="small-input" class="w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 sm:text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"> -->
+                    <p><b>Database : </b><a class="underline decoration-indigo-400/80">{{ db_data['Database'] }}</a></p>
+                    <p><b>User : </b><a class="underline decoration-indigo-500/80">{{ db_data['user'] }}</a></p>
+                    <p><b>Host : </b><a class="underline decoration-indigo-600/80">{{ db_data['host'] }}</a></p>
+                    <p><b>Port : </b><a class="underline decoration-indigo-700/80">{{ db_data['port'] }}</a></p>
+                </div>
+                <button id="closeModalButton" class="text-xs mt-3 bg-green-700 text-slate-100 hover:bg-lime-400 hover:text-slate-800 hover:font-semibold px-1 py-1 rounded-md">
+                    Close
+                </button>
+            </div>
+        </div>
+        <script src="{{ url_for('static', filename='script/clock.js') }}"></script>
+        <script src="{{ url_for('static', filename='script/table-filter.js') }}"></script>
+        <script>
+            const openModalButton = document.getElementById('openModalButton');
+            const closeModalButton = document.getElementById('closeModalButton');
+            const modal = document.getElementById('myModal');
+          
+            openModalButton.addEventListener('click', () => {
+              modal.classList.remove('hidden');
+            });
+          
+            closeModalButton.addEventListener('click', () => {
+              modal.classList.add('hidden');
+            });
+        
+        // text area functions
+        $("#clear-prompt").click(function(){
+            $("#prompt").val("");
+        })
+        $("#request-query").click(function(){
+            let combinedData = "";
+            $(".checkbox:checked").each(function() {
+            const row = $(this).closest("tr");
+            const column1 = row.find("td:nth-child(1)").text();
+            const column2 = row.find("td:nth-child(2)").text();
+            const column3 = row.find("td:nth-child(3)").text();
+            const column4 = row.find("td:nth-child(4)").text();
+            let columns = column3.split(",")
+            let dtypes = column4.split(",")
+            coltype=''
+            for(let i=0;i<columns.length;i++){
+                coltype+=`(${columns[i]},${dtypes[i]}),`
+            }
+            combinedData += `table: ${column1}, schema: ${column2}, columns: ${coltype}\n`;
+            });
+            $.ajax({
+                url: "/process_textarea",
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify({'query':$("#prompt").val(),'schema':combinedData}),
+                success: function(response) {
+                    $("#prompt").val(response.trim());
+                    $("#request-query").addClass('hidden');
+                    $("#execute-query").removeClass('hidden');
+                    $("#clear-prompt").addClass('hidden');
+                    $("#reset-prompt").removeClass('hidden');
+                }
+                });
+        });
+        $("#execute-query").click(function(){
+            window.location.href = `/output_page`;
+        })
+        $("#reset-prompt").click(function(){
+            $("#prompt").val('');
+            $("#request-query").removeClass('hidden');
+            $("#execute-query").addClass('hidden');
+            $("#clear-prompt").removeClass('hidden');
+            $("#reset-prompt").addClass('hidden');
+        }) 
+        </script>
+        <script>
+            const slider = document.querySelector('input[type="range"]');
+            const sliderValue = document.getElementById('sliderValue');
+          
+            slider.addEventListener('input', (event) => {
+              const value = parseFloat(event.target.value).toFixed(1);
+              sliderValue.textContent = value;
+            });
+          </script>
+    </body>
+</html>
