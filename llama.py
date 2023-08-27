@@ -1,6 +1,11 @@
 from ctransformers import AutoModelForCausalLM
 import time
 import re
+import os
+from dotenv import load_dotenv
+
+nv_path = os.path.join(os.path.dirname(__file__), 'config', '.env')
+load_dotenv(dotenv_path=nv_path)
 
 class llm:
     def __init__(self,model='TheBloke/CodeLlama-7B-Instruct-GGUF',version='codellama-7b-instruct.Q5_K_M.gguf'):
@@ -13,7 +18,7 @@ class llm:
     def load_model(self):
         try:
             if self.model and self.version:
-                llm_model = AutoModelForCausalLM.from_pretrained("D:/Projects/Git Projects/projects/MODEL/model/hub/models--TheBloke--CodeLlama-7B-Instruct-GGUF/snapshots/5fd0463ba9e09ab9da583749d5a85daebf5b58d0/",local_files_only=True)
+                llm_model = AutoModelForCausalLM.from_pretrained(os.environ['MODEL_PATH'],local_files_only=True)
                 print(llm_model)
             elif self.model:
                 llm_model = AutoModelForCausalLM.from_pretrained(self.model,local_files_only=True)
