@@ -31,7 +31,7 @@
                     <textarea id="prompt" class="w-full border border-gray-300 p-2 rounded-md focus:outline-none focus:border-blue-500 text-left text-sm" 
                     placeholder="Request data from the below tables" style="font-size: 10px !important; font-weight: bold;" rows="4">
                     </textarea>
-                    <div class="p-4">
+                    <!-- <div class="p-4">
                         <label class="block font-medium text-gray-700">Temperature Controller</label>
                         <input
                           type="range"
@@ -41,7 +41,7 @@
                           class="w-full mt-2 appearance-none bg-gray-300 h-1 rounded-lg focus:outline-none focus:bg-blue-400"
                         >
                         <p class="mt-2 text-sm text-gray-600">Value: <span id="sliderValue">0.5</span></p>
-                      </div>
+                      </div> -->
                     <div class="flex items-center justify-between p-2">
                         <button id="request-query" class="flex bg-green-800 text-white px-1 py-1 rounded-md text-xs hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-blue-300">
                             <img width="14" height="14" src="https://img.icons8.com/arcade/64/process.png" alt="process"/>
@@ -176,7 +176,7 @@
             $("#reset-prompt").addClass('hidden');
         }) 
         </script>
-        <script>
+        <!-- <script>
             const slider = document.querySelector('input[type="range"]');
             const sliderValue = document.getElementById('sliderValue');
           
@@ -184,6 +184,6 @@
               const value = parseFloat(event.target.value).toFixed(1);
               sliderValue.textContent = value;
             });
-          </script>
+        </script> -->
     </body>
 </html>

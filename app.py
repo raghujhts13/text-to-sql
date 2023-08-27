@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 from dbconnection import dbactivities
 import pygwalker as pyg
 import pandas as pd
+from llama import llm
 import time
 
 nv_path = os.path.join(os.path.dirname(__file__), 'config', '.env')
@@ -18,6 +19,7 @@ app.secret_key = os.environ['FLASK_KEY']
 
 # Initiate the DB Handling Script
 dbcon = dbactivities()
+llm_model = llm()
 db_schema = dbcon.index()
 print('SQL data fetched successfully')
 
@@ -32,6 +34,7 @@ current_query = 'select * from all'
 current_table = 'nothing'
 tokens_consumed = 0
 time_difference=0
+
 def query_generator(question):
     response = openai.ChatCompletion.create(
         model='gpt-3.5-turbo',
@@ -50,6 +53,8 @@ def index():
     normalized_data = json.loads(normalized_data)
     return render_template('index.html',json_data=normalized_data, db_data=connectionstring)
 
+# Keep the below function for openAI
+'''
 @app.route('/process_textarea', methods=['POST'])
 def process_textarea():
     start_time = time.time()
@@ -61,6 +66,19 @@ def process_textarea():
     # current_query, tokens_consumed = query_generator(prompt)
     # global time_difference
     # time_difference = round((time.time() - start_time) * 1000)
+    return current_query
+'''
+
+# function for llama
+@app.route('/process_textarea', methods=['POST'])
+def process_textarea():
+    content = request.get_json()
+    global current_query 
+    # current_query = "SELECT * FROM SalesLT.Customer;"
+    current_query, time_taken = llm_model.response_capturer(content['schema'],content['query'])
+    global time_difference
+    time_difference = time_taken
+    print(time_taken)
     return current_query
 
 @app.route('/output_page')

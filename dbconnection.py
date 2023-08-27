@@ -11,7 +11,6 @@ load_dotenv(dotenv_path=nv_path)
 
 class dbactivities:
     ### Write down all the SQL related queries here ###
-
     def __init__(self):
         # Connection parameters
         self.host = os.environ['HOST']
