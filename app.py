@@ -27,8 +27,8 @@ connectionstring = {'Database':os.environ['DB'],
                 'user':os.environ['USER'],
                 'host':os.environ['HOST'],
                 'port':os.environ['PORT']}
-prompt_template = '''You are a professional SQL developer. Given an input question, respond only with 
-                    syntactically correct sqlserver query using the provided schema :""schema""\n\nInstrcutions:""instruction""'''
+# prompt_template = '''You are a professional SQL developer. Given an input question, respond only with syntactically correct sqlserver 
+#                     query using the provided schema.\n\nSchema:""schema""\n\nInstrcutions:""instruction""'''
 
 current_query = 'select * from all'
 current_table = 'nothing'
@@ -80,6 +80,14 @@ def process_textarea():
     time_difference = time_taken
     print(time_taken)
     return current_query
+
+# function to clean the response
+@app.route('/clean_query', methods=['POST'])
+def clean_query():
+    content = request.get_json()
+    global current_query
+    current_query = content['query']
+    return 'done'
 
 @app.route('/output_page')
 def output_page():

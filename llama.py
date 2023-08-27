@@ -13,8 +13,8 @@ class llm:
         self.version = version
         self.llm = ''
         self.template = '''[INST] You are a professional SQL developer. Understand the question asked and return the most suitable query
-                            supported by SQLSERVER using the following schema : {schema}. Always combine the schema with table name when
-                            writing the query. Please wrap your code answer using ```: {prompt} [/INST]'''
+                            supported by SQLSERVER using the table schema : ""{schema}"". Always combine the schema name with table
+                            name when writing the query. Always wrap your code answer using ```: {prompt} [/INST]'''
     def load_model(self):
         try:
             if self.model and self.version:
@@ -35,10 +35,10 @@ class llm:
             else:
                  model = self.load_model()
                  if type(model)==str:
-                     raise Exception('unable to fetch the model')
+                     raise Exception(model)
             sql_query = model(template)
-            print(sql_query)
-            sql_query = re.findall(r'```sql([\s\S]*?)```',sql_query, re.DOTALL)[0]
+            # print(sql_query)
+            # sql_query = re.findall(r'```([\s\S]*?)```',sql_query, re.DOTALL)[0]
             end_time = time.time()
             return sql_query, (end_time-start_time)
         except Exception as e:

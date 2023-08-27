@@ -17,6 +17,21 @@
         input:focus {
             outline: none; /* Remove the outline when input is focused */
         }
+        svg {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            height: 150px;
+            width: 150px;
+        }
+        #bufferer{
+            background: #000;
+        }
+        .disabled {
+            pointer-events: none; /* Prevents interactions */
+            opacity: 0.5; /* Adds a visual indication of being disabled */
+        }
     </style>
     <body>
         <div id="app">
@@ -31,6 +46,7 @@
                     <textarea id="prompt" class="w-full border border-gray-300 p-2 rounded-md focus:outline-none focus:border-blue-500 text-left text-sm" 
                     placeholder="Request data from the below tables" style="font-size: 10px !important; font-weight: bold;" rows="4">
                     </textarea>
+                    <span class="hidden warningtext text-red-600 text-xs font-semibold">Enter a valid text</span>
                     <!-- <div class="p-4">
                         <label class="block font-medium text-gray-700">Temperature Controller</label>
                         <input
@@ -68,7 +84,13 @@
                 <div class="col-start-2 col-end-8">
                     <div class="col-start-2 col-end-8 p-4 w-full">
                         <input id="filterInput" class="col-start-2 col-end-8 p-4 w-full" type="text" placeholder="Search schema and tables">
-                      </div>
+                    </div>
+                    <div class="flex justify-end">
+                        <label class="inline-flex items-center">
+                            <input id="masterCheckbox" type="checkbox" class="form-checkbox text-indigo-600" checked>
+                            <span class="ml-1 text-xs">Select All</span>
+                        </label>
+                    </div>
                         <table id="database_schema" class="text-xs table-fixed text-sm w-full border-collapse border border-slate-100">
                         <caption class="caption-top">
                             List of all available base tables in the database
@@ -99,6 +121,7 @@
                 </div>
             </div>
         </div>
+        <div id="overlay" class="overlay"></div>
         <!-- MODAL -->
         <div id="myModal" class="hidden fixed inset-0 flex items-center justify-center z-50">
             <div class="p-4 rounded-md shadow-lg bg-lime-200">
@@ -116,6 +139,45 @@
                 </button>
             </div>
         </div>
+        <!-- Page bufferer -->
+        <div id="modalContainer" class="hidden modal-container">
+            <div class="modal-content p-6 rounded shadow-md">
+                <svg viewBox="0 0 100 100">
+                    <g fill="#000" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="6">
+                        <!-- left line -->
+                        <path d="M 21 40 V 59">
+                            <animateTransform attributeName="transform" attributeType="XML" type="rotate" values="0 21 59; 180 21 59"
+                      dur="2s" repeatCount="indefinite" />
+                        </path>
+                        <!-- right line -->
+                        <path d="M 79 40 V 59">
+                            <animateTransform attributeName="transform" attributeType="XML" type="rotate" values="0 79 59; -180 79 59"
+                      dur="2s" repeatCount="indefinite" />
+                        </path>
+                        <!-- top line -->
+                        <path d="M 50 21 V 40">
+                            <animate attributeName="d" values="M 50 21 V 40; M 50 59 V 40" dur="2s" repeatCount="indefinite" />
+                        </path>
+                        <!-- btm line -->
+                        <path d="M 50 60 V 79">
+                            <animate attributeName="d" values="M 50 60 V 79; M 50 98 V 79" dur="2s" repeatCount="indefinite" />
+                        </path>
+                        <!-- top box -->
+                        <path d="M 50 21 L 79 40 L 50 60 L 21 40 Z">
+                        <animate attributeName="stroke" values="rgba(255,255,255,1); rgba(100,100,100,0)" dur="2s" repeatCount="indefinite" />
+                        </path>
+                        <!-- mid box -->
+                        <path d="M 50 40 L 79 59 L 50 79 L 21 59 Z"/>
+                        <!-- btm box -->
+                        <path d="M 50 59 L 79 78 L 50 98 L 21 78 Z">
+                        <animate attributeName="stroke" values="rgba(100,100,100,0); rgba(255,255,255,1)" dur="2s" repeatCount="indefinite" />
+                        </path>
+                        <animateTransform attributeName="transform" attributeType="XML" type="translate" values="0 0; 0 -19" dur="2s" repeatCount="indefinite" />
+                    </g>
+                </svg>
+            </div>
+          </div>
+
         <script src="{{ url_for('static', filename='script/clock.js') }}"></script>
         <script src="{{ url_for('static', filename='script/table-filter.js') }}"></script>
         <script>
@@ -136,6 +198,13 @@
             $("#prompt").val("");
         })
         $("#request-query").click(function(){
+            if($("#prompt").val().trim()==''){
+                $(".warningtext").removeClass('hidden');
+            }
+            else{
+                $("#app").addClass('disabled');
+            $('#modalContainer').removeClass('hidden');
+            $('#modalContainer').style.display = 'block';
             let combinedData = "";
             $(".checkbox:checked").each(function() {
             const row = $(this).closest("tr");
@@ -162,11 +231,22 @@
                     $("#execute-query").removeClass('hidden');
                     $("#clear-prompt").addClass('hidden');
                     $("#reset-prompt").removeClass('hidden');
+                    $('#modalContainer').addClass('hidden');
+                    $("#app").removeClass('disabled');
                 }
                 });
+            }
         });
         $("#execute-query").click(function(){
-            window.location.href = `/output_page`;
+            $.ajax({
+                url: "/clean_query",
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify({'query':$("#prompt").val()}),
+                success: function(response) {
+                    window.location.href = `/output_page`;
+                }
+            });
         })
         $("#reset-prompt").click(function(){
             $("#prompt").val('');
@@ -176,6 +256,19 @@
             $("#reset-prompt").addClass('hidden');
         }) 
         </script>
+        <script>
+            const masterCheckbox = document.getElementById('masterCheckbox');
+            const checkboxes = document.querySelectorAll('.checkbox');
+            const rows1 = tableBody.getElementsByTagName('tr');
+            masterCheckbox.addEventListener('change', () => {
+                for (let i = 0; i < checkboxes.length; i++) {
+                    if (rows1[i].style.display !== 'none') {
+                        checkboxes[i].checked = masterCheckbox.checked;
+                    }
+                }
+            });
+        </script>
+        <!-- For OpenAI temperature controller -->
         <!-- <script>
             const slider = document.querySelector('input[type="range"]');
             const sliderValue = document.getElementById('sliderValue');
