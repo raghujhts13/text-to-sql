@@ -12,6 +12,7 @@
         <link href="https://cdn.datatables.net/responsive/2.2.3/css/responsive.dataTables.min.css" rel="stylesheet">
     </head>
     <body>
+        {% include "navbar.html" %}
         <div class="p-2 grid gap-4 grid-cols-10">
             <div class="col-start-3 col-end-8 block rounded-lg bg-white text-center shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] dark:bg-neutral-700">
                 <div class="border-b-2 border-neutral-100 px-6 py-3 dark:border-neutral-600 dark:text-neutral-50">
@@ -111,6 +112,7 @@
                 console.error('Error fetching HTML:', error);
             }
         });
+        $(".navbar").removeClass('sticky');
     </script>
     </body> 
 </html>

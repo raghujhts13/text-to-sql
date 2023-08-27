@@ -5,17 +5,18 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <script src="https://cdn.tailwindcss.com"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+        <!-- <link rel="stylesheet" href="https://demos.creative-tim.com/notus-js/assets/styles/tailwind.css"> -->
+        <link rel="stylesheet" href="https://demos.creative-tim.com/notus-js/assets/vendor/@fortawesome/fontawesome-free/css/all.min.css">
     </head>
     <style>
         .clock{
             border: 2px;
-            background-color: #0D0208;
-            color: #00FF41;
+            color: #1E293B;
             padding: 1px;
             border-radius: 5px;
         }
         input:focus {
-            outline: none; /* Remove the outline when input is focused */
+            outline: none !important; /* Remove the outline when input is focused */
         }
         svg {
             position: fixed;
@@ -32,21 +33,57 @@
             pointer-events: none; /* Prevents interactions */
             opacity: 0.5; /* Adds a visual indication of being disabled */
         }
+        nav{
+            margin-bottom: 0px;
+        }
+        body, #filterInput, nav{
+            background-color: #FAF1E4;
+        }
+        th{
+            background-color: #435334;
+            color: beige;
+        }
+        tr{
+            background-color: #e4edda;
+            color: #1E293B;
+        }
+        .checkbox, #masterCheckbox{
+            accent-color: #CEDEBD;
+        }
+        ::-webkit-scrollbar-track
+        {
+            border: 1px solid white;
+            /* border color does not support transparent on scrollbar */
+            /* border-color: transparent; */
+            background-color: #b2bec3;
+        }
+        ::-webkit-scrollbar
+        {
+            width: 2px;
+            height: 3px;
+            background-color: #dfe6e9;
+        }
+
+        ::-webkit-scrollbar-thumb
+        {
+            background-color: #9EB384;
+            border-radius: 10px;
+        }
+
     </style>
     <body>
+        {% include "navbar.html" %}
         <div id="app">
             <div class="grid gap-4 grid-cols-8">
-                <div class="clock absolute top-0 right-0 m-4 text-xl font-bold">
-                    <span id="clock"></span>
-                </div><br>
                 <div class="col-start-2 col-end-8">
-                    <label class="text-gray-700 text-sm font-bold mb-2" for="textarea">
-                      &nbsp;&nbsp;SQL Server Query Generator
+                    <label class="text-gray-700 text-sm font-bold mb-2 border border-transparent" for="textarea">
+                      &nbsp;&nbsp;SQL Server Query Generator<span class="text-xs font-medium">&nbsp;&nbsp;(response time will be based on the query,model size and the hardware used)</span>
                     </label>
                     <textarea id="prompt" class="w-full border border-gray-300 p-2 rounded-md focus:outline-none focus:border-blue-500 text-left text-sm" 
-                    placeholder="Request data from the below tables" style="font-size: 10px !important; font-weight: bold;" rows="4">
+                    placeholder="search your data" style="font-size: 10px !important; font-weight: bold;" rows="4">
                     </textarea>
                     <span class="hidden warningtext text-red-600 text-xs font-semibold">Enter a valid text</span>
+                    <!-- openai gpt -->
                     <!-- <div class="p-4">
                         <label class="block font-medium text-gray-700">Temperature Controller</label>
                         <input
@@ -58,6 +95,7 @@
                         >
                         <p class="mt-2 text-sm text-gray-600">Value: <span id="sliderValue">0.5</span></p>
                       </div> -->
+                      <!-- openai gpt -->
                     <div class="flex items-center justify-between p-2">
                         <button id="request-query" class="flex bg-green-800 text-white px-1 py-1 rounded-md text-xs hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-blue-300">
                             <img width="14" height="14" src="https://img.icons8.com/arcade/64/process.png" alt="process"/>
@@ -86,21 +124,22 @@
                         <input id="filterInput" class="col-start-2 col-end-8 p-4 w-full" type="text" placeholder="Search schema and tables">
                     </div>
                     <div class="flex justify-end">
-                        <label class="inline-flex items-center">
-                            <input id="masterCheckbox" type="checkbox" class="form-checkbox text-indigo-600" checked>
-                            <span class="ml-1 text-xs">Select All</span>
-                        </label>
+                        
                     </div>
                         <table id="database_schema" class="text-xs table-fixed text-sm w-full border-collapse border border-slate-100">
-                        <caption class="caption-top">
-                            List of all available base tables in the database
-                        </caption>
-                        <thead>
+                            <caption class="caption-top">
+                                Please select appropriate tables for better and quicker results
+                            </caption>
+                        <thead class="text-base">
                             <th class="w-1/4 p-2 text-center border border-slate-300">Table</th>
                             <th class="w-1/6 p-2 text-center border border-slate-300">Schema</th>
                             <th class="w-1/2 p-2 text-center border border-slate-300">Column</th>
-                            <!-- <th class="p-2 text-center border border-slate-300">Datatype</th> -->
-                            <th class="p-2 text-center border border-slate-300">Selected</th>
+                            <th class="w-1/6 p-2 text-center border border-slate-300">
+                                    <label class="py-4">
+                                        Selected
+                                        <input id="masterCheckbox" type="checkbox" class="form-checkbox ml-auto text-indigo-600" checked> 
+                                    </label>
+                            </th>
                         </thead>
                         <tbody id="tableBody">
                                 {% for keys,values in json_data.items() %}
@@ -108,10 +147,9 @@
                                         <td class="p-2 text-left border border-slate-300">{{ keys }}</td>
                                         <td class="p-2 text-center border border-slate-300">{{values[0]['schema']}}</td>
                                         <td class="p-2 max-h-10 overflow-y-auto border border-slate-300">{{values[0]['name']}}</td>
-                                        <!-- <td class="p-2 max-h-10 overflow-y-auto border border-slate-300">{{values[0]['dtypes']}}</td> -->
                                         <td class="p-2 text-center border border-slate-300">
                                             <label>
-                                                <input type="checkbox" class="checkbox accent-orange-500/50" checked>
+                                                <input type="checkbox" class="checkbox" checked>
                                             </label>
                                         </td>
                                     </tr>
@@ -127,8 +165,6 @@
             <div class="p-4 rounded-md shadow-lg bg-lime-200">
                 <h2 class="text-md font-semibold mb-2">Connection Parameters</h2>
                 <div class="text-xs">
-                    <!-- <label for="small-input" class="block mb-2 text-xs text-gray-900 dark:text-white">Small input</label>
-                    <input type="text" id="small-input" class="w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 sm:text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"> -->
                     <p><b>Database : </b><a class="underline decoration-indigo-400/80">{{ db_data['Database'] }}</a></p>
                     <p><b>User : </b><a class="underline decoration-indigo-500/80">{{ db_data['user'] }}</a></p>
                     <p><b>Host : </b><a class="underline decoration-indigo-600/80">{{ db_data['host'] }}</a></p>
@@ -177,106 +213,8 @@
                 </svg>
             </div>
           </div>
-
         <script src="{{ url_for('static', filename='script/clock.js') }}"></script>
         <script src="{{ url_for('static', filename='script/table-filter.js') }}"></script>
-        <script>
-            const openModalButton = document.getElementById('openModalButton');
-            const closeModalButton = document.getElementById('closeModalButton');
-            const modal = document.getElementById('myModal');
-          
-            openModalButton.addEventListener('click', () => {
-              modal.classList.remove('hidden');
-            });
-          
-            closeModalButton.addEventListener('click', () => {
-              modal.classList.add('hidden');
-            });
-        
-        // text area functions
-        $("#clear-prompt").click(function(){
-            $("#prompt").val("");
-        })
-        $("#request-query").click(function(){
-            if($("#prompt").val().trim()==''){
-                $(".warningtext").removeClass('hidden');
-            }
-            else{
-                $("#app").addClass('disabled');
-            $('#modalContainer').removeClass('hidden');
-            $('#modalContainer').style.display = 'block';
-            let combinedData = "";
-            $(".checkbox:checked").each(function() {
-            const row = $(this).closest("tr");
-            const column1 = row.find("td:nth-child(1)").text();
-            const column2 = row.find("td:nth-child(2)").text();
-            const column3 = row.find("td:nth-child(3)").text();
-            const column4 = row.find("td:nth-child(4)").text();
-            let columns = column3.split(",")
-            let dtypes = column4.split(",")
-            coltype=''
-            for(let i=0;i<columns.length;i++){
-                coltype+=`(${columns[i]},${dtypes[i]}),`
-            }
-            combinedData += `table: ${column1}, schema: ${column2}, columns: ${coltype}\n`;
-            });
-            $.ajax({
-                url: "/process_textarea",
-                type: "POST",
-                contentType: "application/json",
-                data: JSON.stringify({'query':$("#prompt").val(),'schema':combinedData}),
-                success: function(response) {
-                    $("#prompt").val(response.trim());
-                    $("#request-query").addClass('hidden');
-                    $("#execute-query").removeClass('hidden');
-                    $("#clear-prompt").addClass('hidden');
-                    $("#reset-prompt").removeClass('hidden');
-                    $('#modalContainer').addClass('hidden');
-                    $("#app").removeClass('disabled');
-                }
-                });
-            }
-        });
-        $("#execute-query").click(function(){
-            $.ajax({
-                url: "/clean_query",
-                type: "POST",
-                contentType: "application/json",
-                data: JSON.stringify({'query':$("#prompt").val()}),
-                success: function(response) {
-                    window.location.href = `/output_page`;
-                }
-            });
-        })
-        $("#reset-prompt").click(function(){
-            $("#prompt").val('');
-            $("#request-query").removeClass('hidden');
-            $("#execute-query").addClass('hidden');
-            $("#clear-prompt").removeClass('hidden');
-            $("#reset-prompt").addClass('hidden');
-        }) 
-        </script>
-        <script>
-            const masterCheckbox = document.getElementById('masterCheckbox');
-            const checkboxes = document.querySelectorAll('.checkbox');
-            const rows1 = tableBody.getElementsByTagName('tr');
-            masterCheckbox.addEventListener('change', () => {
-                for (let i = 0; i < checkboxes.length; i++) {
-                    if (rows1[i].style.display !== 'none') {
-                        checkboxes[i].checked = masterCheckbox.checked;
-                    }
-                }
-            });
-        </script>
-        <!-- For OpenAI temperature controller -->
-        <!-- <script>
-            const slider = document.querySelector('input[type="range"]');
-            const sliderValue = document.getElementById('sliderValue');
-          
-            slider.addEventListener('input', (event) => {
-              const value = parseFloat(event.target.value).toFixed(1);
-              sliderValue.textContent = value;
-            });
-        </script> -->
+        <script src="{{ url_for('static', filename='script/index.js') }}"></script>
     </body>
 </html>

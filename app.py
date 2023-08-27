@@ -30,7 +30,7 @@ connectionstring = {'Database':os.environ['DB'],
 # prompt_template = '''You are a professional SQL developer. Given an input question, respond only with syntactically correct sqlserver 
 #                     query using the provided schema.\n\nSchema:""schema""\n\nInstrcutions:""instruction""'''
 
-current_query = 'select * from all'
+current_query = 'select * from SalesLT.Address'
 current_table = 'nothing'
 tokens_consumed = 0
 time_difference=0
