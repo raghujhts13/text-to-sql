@@ -19,7 +19,7 @@ app.secret_key = os.environ['FLASK_KEY']
 
 # Initiate the DB Handling Script
 dbcon = dbactivities()
-llm_model = llm()
+llm_model = llm('TheBloke/CodeLlama-7B-Instruct-GGUF','codellama-7b-instruct.Q5_K_M.gguf')
 db_schema = dbcon.index()
 print('SQL data fetched successfully')
 
@@ -27,8 +27,11 @@ connectionstring = {'Database':os.environ['DB'],
                 'user':os.environ['USER'],
                 'host':os.environ['HOST'],
                 'port':os.environ['PORT']}
+
+# ==================================FOR OPENAI GPT===========================================
 # prompt_template = '''You are a professional SQL developer. Given an input question, respond only with syntactically correct sqlserver 
 #                     query using the provided schema.\n\nSchema:""schema""\n\nInstrcutions:""instruction""'''
+# ==================================FOR OPENAI GPT===========================================
 
 current_query = 'select * from SalesLT.Address'
 current_table = 'nothing'
@@ -78,8 +81,7 @@ def process_textarea():
     current_query, time_taken = llm_model.response_capturer(content['schema'],content['query'])
     global time_difference
     time_difference = time_taken
-    print(time_taken)
-    return current_query
+    return {'query':current_query, 'time':time_taken}
 
 # function to clean the response
 @app.route('/clean_query', methods=['POST'])
@@ -100,7 +102,10 @@ def output_page():
 
 @app.route('/render_dashboard')
 def render_dashboard():
-    df = pd.DataFrame(current_table)
+    if isinstance(current_table,pd.DataFrame):
+        df=current_table
+    else:
+        df = pd.DataFrame(current_table)
     walker = pyg.walk(df,hideDataSourceConfig=True)
     walker_html = walker.to_html()
     return walker_html

@@ -7,9 +7,12 @@ llama + SQL + PyGWalker + Flask
 - [x] Added manual verification process before executing the SQL query
 - [x] change GPT to llama for sql generation
 - [X] create a select all and unselect all functionality based on schema and tables
-- [ ] added few validations and preloader (WIP)
+- [X] added few validations and preloader (WIP)
 - [ ] fine-tune code-llama-instruct model with custom SQL datasets
+    - [X] fetched dataset
+    - [X] prepared the fine-tuning code and tested the functionality in colab (code concepts work)
+    - [ ] insufficeint capacity in colab => test with SageMaker
+    - [ ] test the updated model and based on results upload to huggingface and use the model
 - [ ] Replace the standard code-llama-instruct-7B with fine-tuned model
-- [ ] Edit the llama.py to add more configurations to model selection and training
 - [ ] change the db creds to come from UI instead of .env
 - [ ] store the response history for current session ( testing feasibility )

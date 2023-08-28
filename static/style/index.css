@@ -1,0 +1,49 @@
+.clock{
+    border: 2px;
+    color: #1E293B;
+    padding: 1px;
+    border-radius: 5px;
+}
+input:focus {
+    outline: none !important; /* Remove the outline when input is focused */
+}
+svg {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    height: 150px;
+    width: 150px;
+}
+#bufferer{
+    background: #000;
+}
+.disabled {
+    pointer-events: none; /* Prevents interactions */
+    opacity: 0.5; /* Adds a visual indication of being disabled */
+}
+nav{
+    margin-bottom: 0px;
+}
+body, #filterInput, textarea{
+    background-color: #FAF1E4;
+}
+nav, footer{
+    /* background-color: #f1d7b7; */
+    background-color: #fcf7f0 !important;
+}
+th{
+    /* background-color: #435334; */
+    /* color: beige; */
+    background-color: #d67c39;
+    color: #1E293B;
+}
+tr{
+    /* background-color: #e4edda; */
+    background-color: #e8bc89;
+    color: #1E293B;
+}
+.checkbox, #masterCheckbox{
+    /* accent-color: #CEDEBD; */
+    accent-color: #c7662f;
+}

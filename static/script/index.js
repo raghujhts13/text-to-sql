@@ -18,44 +18,57 @@ $("#clear-prompt").click(function(){
 $("#prompt").val("");
 })
 $("#request-query").click(function(){
-if($("#prompt").val().trim()==''){
-    $(".warningtext").removeClass('hidden');
-}
-else{
-    $("#app").addClass('disabled');
-$('#modalContainer').removeClass('hidden');
-$('#modalContainer').style.display = 'block';
-let combinedData = "";
-$(".checkbox:checked").each(function() {
-const row = $(this).closest("tr");
-const column1 = row.find("td:nth-child(1)").text();
-const column2 = row.find("td:nth-child(2)").text();
-const column3 = row.find("td:nth-child(3)").text();
-const column4 = row.find("td:nth-child(4)").text();
-let columns = column3.split(",")
-let dtypes = column4.split(",")
-coltype=''
-for(let i=0;i<columns.length;i++){
-    coltype+=`(${columns[i]},${dtypes[i]}),`
-}
-combinedData += `table: ${column1}, schema: ${column2}, columns: ${coltype}\n`;
-});
-$.ajax({
-    url: "/process_textarea",
-    type: "POST",
-    contentType: "application/json",
-    data: JSON.stringify({'query':$("#prompt").val(),'schema':combinedData}),
-    success: function(response) {
-        $("#prompt").val(response.trim());
-        $("#request-query").addClass('hidden');
-        $("#execute-query").removeClass('hidden');
-        $("#clear-prompt").addClass('hidden');
-        $("#reset-prompt").removeClass('hidden');
-        $('#modalContainer').addClass('hidden');
-        $("#app").removeClass('disabled');
+    $(".successtext").addClass('hidden');
+    if($("#prompt").val().trim()==''){
+        $(".warningtext").removeClass('hidden');
+        $(".warningcheckbox").addClass('hidden');
     }
-    });
-}
+    else if(document.querySelectorAll('.checkbox:checked').length==0){
+        $(".warningtext").addClass('hidden');
+        $(".warningcheckbox").removeClass('hidden');
+    }
+    else{
+        $(".warningtext").addClass('hidden');
+        $(".warningcheckbox").addClass('hidden');
+        $('#modalContainer').removeClass('hidden');
+        // $('#modalContainer').style.display = 'block';
+        let combinedData = "";
+        $(".checkbox:checked").each(function() {
+            const row = $(this).closest("tr");
+            const column1 = row.find("td:nth-child(1)").text();
+            const column2 = row.find("td:nth-child(2)").text();
+            const column3 = row.find("td:nth-child(3)").text();
+            const column4 = row.find("td:nth-child(4)").text();
+            let columns = column3.split(",")
+            let dtypes = column4.split(",")
+            coltype=''
+            for(let i=0;i<columns.length;i++){
+                // coltype+=`(${columns[i]},${dtypes[i]}),`
+                coltype+=` ${columns[i]} [ ${dtypes[i]}] `
+            }
+            combinedData += `schema: ${column2}, table: ${column1}, columns: ${coltype}\n`;
+        });
+        $(".functionclass").addClass('disabled');
+        $.ajax({
+            url: "/process_textarea",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({'query':$("#prompt").val(),'schema':combinedData}),
+            success: function(response) {
+                $(".functionclass").removeClass('disabled');
+                $("#prompt").val(response['query'].trim());
+                $("#time-taken").text(response['time']);
+                $("#request-query").addClass('hidden');
+                $("#execute-query").removeClass('hidden');
+                $("#clear-prompt").addClass('hidden');
+                $("#reset-prompt").removeClass('hidden');
+                $('#modalContainer').addClass('hidden');
+                $(".warningtext").addClass('hidden');
+                $(".warningcheckbox").addClass('hidden');
+                $(".successtext").removeClass('hidden');
+            }
+        });
+    }
 });
 $("#execute-query").click(function(){
 $.ajax({
@@ -69,11 +82,14 @@ $.ajax({
 });
 })
 $("#reset-prompt").click(function(){
-$("#prompt").val('');
-$("#request-query").removeClass('hidden');
-$("#execute-query").addClass('hidden');
-$("#clear-prompt").removeClass('hidden');
-$("#reset-prompt").addClass('hidden');
+    $("#prompt").val('');
+    $(".warningtext").addClass('hidden');
+    $(".warningcheckbox").addClass('hidden');
+    $(".successtext").addClass('hidden');
+    $("#request-query").removeClass('hidden');
+    $("#execute-query").addClass('hidden');
+    $("#clear-prompt").removeClass('hidden');
+    $("#reset-prompt").addClass('hidden');
 }) 
 
 const masterCheckbox = document.getElementById('masterCheckbox');

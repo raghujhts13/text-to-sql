@@ -62,9 +62,7 @@ class dbactivities:
         return tblcolumns, tbltype
     
     def query_outputs(self, query):
-        print('entered')
         df = pd.read_sql(query, self.engine)
-        print(df.head())
         def is_overflow(value):
             try:
                 json.dumps(value)

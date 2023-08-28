@@ -7,25 +7,34 @@ from dotenv import load_dotenv
 nv_path = os.path.join(os.path.dirname(__file__), 'config', '.env')
 load_dotenv(dotenv_path=nv_path)
 
+# os.environ['HF_HOME'] = "path to your model..." # this is to download your model to specific location instead of "/users/{user}/.cache"
 class llm:
-    def __init__(self,model='TheBloke/CodeLlama-7B-Instruct-GGUF',version='codellama-7b-instruct.Q5_K_M.gguf'):
+    def __init__(self,model='',version=''):
         self.model = model
         self.version = version
         self.llm = ''
         self.template = '''[INST] You are a professional SQL developer. Understand the question asked and return the most suitable query
-                            supported by SQLSERVER using the table schema : ""{schema}"". Always combine the schema name with table
-                            name when writing the query. Always wrap your code answer using ```: {prompt} [/INST]'''
+                            supported by SQLSERVER using the table : ""{schema}"". Always combine the schema name with table
+                            name when writing the query. Always wrap your code answer using ```. question: {prompt} [/INST]'''
     def load_model(self):
         try:
             if self.model and self.version:
                 llm_model = AutoModelForCausalLM.from_pretrained(os.environ['MODEL_PATH'],local_files_only=True)
-                print(llm_model)
             elif self.model:
                 llm_model = AutoModelForCausalLM.from_pretrained(self.model,local_files_only=True)
+            else:
+                raise Exception("You don't have a local model")
             self.llm = llm_model
             return llm_model
-        except:
-            return 'Error loading the model'
+        except Exception as e:
+            try:
+                if self.model and self.version:
+                    llm_model = AutoModelForCausalLM.from_pretrained(self.model,model_file=self.version)
+                elif self.model:
+                    llm_model = AutoModelForCausalLM.from_pretrained(self.model)
+                self.llm = llm_model
+            except Exception as e:
+                return f'Unable to find a local model. When tried to install, below error occurred\n{e}'
     def response_capturer(self,schema,prompt):
         try:
             start_time=time.time()
@@ -37,7 +46,6 @@ class llm:
                  if type(model)==str:
                      raise Exception(model)
             sql_query = model(template)
-            # print(sql_query)
             # sql_query = re.findall(r'```([\s\S]*?)```',sql_query, re.DOTALL)[0]
             end_time = time.time()
             return sql_query, (end_time-start_time)
