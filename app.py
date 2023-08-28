@@ -81,7 +81,7 @@ def process_textarea():
     current_query, time_taken = llm_model.response_capturer(content['schema'],content['query'])
     global time_difference
     time_difference = time_taken
-    return {'query':current_query, 'time':time_taken}
+    return {'query':current_query, 'time':round(time_taken/60,3)}
 
 # function to clean the response
 @app.route('/clean_query', methods=['POST'])
