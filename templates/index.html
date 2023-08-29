@@ -7,7 +7,6 @@
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style/index.css') }}">
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style/scrollbar.css') }}">
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
-        <!-- <link rel="stylesheet" href="https://demos.creative-tim.com/notus-js/assets/styles/tailwind.css"> -->
         <link rel="stylesheet" href="https://demos.creative-tim.com/notus-js/assets/vendor/@fortawesome/fontawesome-free/css/all.min.css">
     </head>
     <body>
@@ -24,19 +23,6 @@
                     <span class="hidden warningtext text-red-600 text-xs font-semibold">Enter a valid text</span>
                     <span class="hidden warningcheckbox text-red-600 text-xs font-semibold">Select suitable tables to proceed</span>
                     <span class="hidden successtext text-green-500 text-xs font-semibold">The query was generated in <u id="time-taken" class="text-green-600"></u> minutes</span>
-                    <!-- openai gpt -->
-                    <!-- <div class="p-4">
-                        <label class="block font-medium text-gray-700">Temperature Controller</label>
-                        <input
-                          type="range"
-                          min="0"
-                          max="1"
-                          step="0.1"
-                          class="w-full mt-2 appearance-none bg-gray-300 h-1 rounded-lg focus:outline-none focus:bg-blue-400"
-                        >
-                        <p class="mt-2 text-sm text-gray-600">Value: <span id="sliderValue">0.5</span></p>
-                      </div> -->
-                      <!-- openai gpt -->
                     <div class="functionclass flex items-center justify-between p-2">
                         <button id="request-query" class="flex bg-green-800 text-white px-1 py-1 rounded-md text-xs hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-blue-300">
                             <img width="14" height="14" src="https://img.icons8.com/arcade/64/process.png" alt="process"/>
@@ -60,14 +46,27 @@
                         </button>
                     </div>                      
                 </div>
+                <div class="flex col-start-2 col-end-8 justify-between p-4 w-full">
+                    <input id="filterInput" class="font-semibold text-xs text-slate-600 underline decoration-slate-700" 
+                    type="text" placeholder="Search schema and tables">
+                    <!-- dropdown DB -->
+                    <button id="dropdownDefaultButton" data-dropdown-toggle="dropdown" class="text-white focus:outline-none rounded-lg text-sm 
+                    px-1 py-1 text-center inline-flex items-center" 
+                    type="button">Databases
+                    </button>
+                    <!-- Dropdown menu -->
+                    <div id="dropdown" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
+                        <ul id="dropdown-group" class="py-2 text-sm text-gray-700 overflow-y-auto" aria-labelledby="dropdownDefaultButton">
+                            {% for key in dbs %}
+                            <li>
+                                <a href="#" class="block p-1 hover:bg-gray-100"> {{ key }}</a>
+                            </li>
+                            {% endfor %}    
+                        </ul>
+                    </div>
+                    <!-- dropdown DB -->
+                </div>
                 <div class="col-start-2 col-end-8">
-                    <div class="col-start-2 col-end-8 p-4 w-full">
-                        <input id="filterInput" class="col-start-2 col-end-8 py-4 w-full font-semibold text-xs text-slate-600 underline decoration-slate-700" 
-                        type="text" placeholder="Search schema and tables">
-                    </div>
-                    <div class="flex justify-end">
-                        
-                    </div>
                         <table id="database_schema" class="text-xs table-fixed text-sm w-full border-collapse border border-slate-100">
                             <caption class="caption-top">
                                 Please select appropriate tables for better and quicker results
@@ -159,5 +158,6 @@
         <script src="{{ url_for('static', filename='script/clock.js') }}"></script>
         <script src="{{ url_for('static', filename='script/table-filter.js') }}"></script>
         <script src="{{ url_for('static', filename='script/index.js') }}"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.8.1/flowbite.min.js"></script>
     </body>
 </html>

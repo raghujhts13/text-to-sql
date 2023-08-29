@@ -28,49 +28,18 @@ connectionstring = {'Database':os.environ['DB'],
                 'host':os.environ['HOST'],
                 'port':os.environ['PORT']}
 
-# ==================================FOR OPENAI GPT===========================================
-# prompt_template = '''You are a professional SQL developer. Given an input question, respond only with syntactically correct sqlserver 
-#                     query using the provided schema.\n\nSchema:""schema""\n\nInstrcutions:""instruction""'''
-# ==================================FOR OPENAI GPT===========================================
-
 current_query = 'select * from SalesLT.Address'
 current_table = 'nothing'
 tokens_consumed = 0
 time_difference=0
-
-def query_generator(question):
-    response = openai.ChatCompletion.create(
-        model='gpt-3.5-turbo',
-        max_tokens=500,
-        temperature=0.8,
-        messages=[  
-            {'role':'user','content': question}
-        ]
-    )
-    return response["choices"][0]["message"]["content"], response['usage']['total_tokens']
 
 # FLASK APPLICATION
 @app.get('/')
 def index():
     normalized_data = json.dumps(db_schema)
     normalized_data = json.loads(normalized_data)
-    return render_template('index.html',json_data=normalized_data, db_data=connectionstring)
-
-# Keep the below function for openAI
-'''
-@app.route('/process_textarea', methods=['POST'])
-def process_textarea():
-    start_time = time.time()
-    content = request.get_json()
-    prompt = prompt_template.replace('""schema""',content['schema']).replace('""instruction""',content['query'])
-    global current_query 
-    current_query = "SELECT * FROM SalesLT.Customer;"
-    # global tokens_consumed
-    # current_query, tokens_consumed = query_generator(prompt)
-    # global time_difference
-    # time_difference = round((time.time() - start_time) * 1000)
-    return current_query
-'''
+    databases = dbcon.get_databases()
+    return render_template('index.html',json_data=normalized_data, db_data=connectionstring, dbs=databases)
 
 # function for llama
 @app.route('/process_textarea', methods=['POST'])
@@ -82,7 +51,21 @@ def process_textarea():
     global time_difference
     time_difference = time_taken
     return {'query':current_query, 'time':round(time_taken/60,3)}
-
+# function to change database
+@app.route('/change_db', methods=['POST'])
+def change_db():
+    content = request.get_json()
+    db = content['database']
+    try:
+        if db==os.environ['DB']:
+            return {'status':300,'msg':'no need to change'}
+        else:
+            dbcon.switch_db(db)
+            global db_schema
+            db_schema = dbcon.index()
+            return {'status':200,'msg':'changed successfully'}
+    except Exception as e:
+        return {'status':600,'msg':e}
 # function to clean the response
 @app.route('/clean_query', methods=['POST'])
 def clean_query():

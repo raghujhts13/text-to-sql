@@ -103,11 +103,28 @@ masterCheckbox.addEventListener('change', () => {
     }
 });
 
-// ============open ai gpt slider for temperature========================
-// const slider = document.querySelector('input[type="range"]');
-// const sliderValue = document.getElementById('sliderValue');
+const ulElement = document.getElementById("dropdown-group");
+const liElements = ulElement.getElementsByTagName("li");
 
-// slider.addEventListener('input', (event) => {
-//   const value = parseFloat(event.target.value).toFixed(1);
-//   sliderValue.textContent = value;
-// });
+for (let i = 0; i < liElements.length; i++) {
+  liElements[i].addEventListener("click", function() {
+    let selection = liElements[i].textContent.trim();
+    $.ajax({
+        url: "/change_db",
+        type: "POST",
+        contentType: "application/json",
+        data: JSON.stringify({'database':selection}),
+        success: function(response) {
+            if(response['status']==200){
+                window.location.href = '/';
+            }
+            else if(response['status']==300){
+                console.log(response['msg']);
+            }
+            else{
+                alert(response['msg']);
+            }
+        }
+    });
+  });
+}

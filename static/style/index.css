@@ -47,3 +47,9 @@ tr{
     /* accent-color: #CEDEBD; */
     accent-color: #c7662f;
 }
+#dropdownDefaultButton{
+    background-color: #d67c39;
+}
+#dropdownDefaultButton:hover{
+    background-color: #c7662f;
+}

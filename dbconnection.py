@@ -30,6 +30,25 @@ class dbactivities:
         self.tables = []
         self.columns = []
         self.datatypes = []
+    def get_databases(self):
+        query = f"""
+                SELECT name FROM sys.databases WHERE database_id > 4;
+                """
+        # Execute the query using the engine
+        with self.engine.connect() as connection:
+            result = connection.execute(query)
+            dbs = [row['name'] for row in result] # fetch all the tables
+        return dbs
+    def switch_db(self,db):
+        self.database = db
+        try:
+            connection_string = f'mssql+pymssql://{self.username}:{self.password}@{self.host}:{self.port}/{self.database}'
+            # Create the SQLAlchemy engine
+            self.engine = create_engine(connection_string)
+            print(f'Connection String :: {connection_string}')
+        except Exception as e:
+            print(f'Unable to establish a connection because of the below reason\n{e}')
+            sys.exit(1)
     def get_tables(self):
         ### Get list of all tables ###
         # SQL query to fetch all table names from the database
@@ -51,9 +70,6 @@ class dbactivities:
             FROM INFORMATION_SCHEMA.COLUMNS
             where TABLE_NAME='{table}'
         """
-        # Execute the query using the engine
-        # with self.engine.connect() as connection:
-            # result = connection.execute(query)
         df=pd.read_sql_query(query,self.engine)
         tblcolumns = df['COLUMN_NAME'].values # fetch all the columns
         tbltype = df['DATA_TYPE'].values
@@ -76,16 +92,11 @@ class dbactivities:
                         df.loc[i, col] = str(df.loc[i, col])
         convert_overflow_values(df)
         return df.to_json(date_format='iso') #default_handler=str
-        # with self.engine.connect() as connection:
-        #     result = connection.execute(query)
-        #     rows = result.fetchall()
-        # data = [dict(row) for row in rows]
-        # json_data = json.dumps(data, indent=2)
-        # return json_data
     
     def index(self):
         json_data = {}
         tables = self.get_tables()
+        databases = self.get_databases()
         for table in tables:
             schema = table.split('.')[1]
             table = table.split('.')[2]
