@@ -80,6 +80,7 @@ def output_page():
     current_table = table
     columns = list(table.keys())
     indices = list(table[columns[0]].keys())
+    global time_difference
     return render_template('output.html', db_data=current_query, positions=indices, output=table, gpt_metadata={'tokens':0,'time_taken':time_difference})
 
 @app.route('/render_dashboard')
