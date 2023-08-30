@@ -50,9 +50,10 @@
                     <input id="filterInput" class="font-semibold text-xs text-slate-600 underline decoration-slate-700" 
                     type="text" placeholder="Search schema and tables">
                     <!-- dropdown DB -->
+                    <span class="hidden text-red-600 text-xs" id="samedb">select a different database to change</span>
                     <button id="dropdownDefaultButton" data-dropdown-toggle="dropdown" class="text-white focus:outline-none rounded-lg text-sm 
                     px-1 py-1 text-center inline-flex items-center" 
-                    type="button">Databases
+                    type="button">{{ db_data['Database'] }}
                     </button>
                     <!-- Dropdown menu -->
                     <div id="dropdown" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">

@@ -49,6 +49,7 @@ $("#request-query").click(function(){
             combinedData += `schema: ${column2}, table: ${column1}, columns: ${coltype}\n`;
         });
         $(".functionclass").addClass('disabled');
+        $("#dropdownDefaultButton").addClass('disabled');
         $.ajax({
             url: "/process_textarea",
             type: "POST",
@@ -56,6 +57,7 @@ $("#request-query").click(function(){
             data: JSON.stringify({'query':$("#prompt").val(),'schema':combinedData}),
             success: function(response) {
                 $(".functionclass").removeClass('disabled');
+                $("#dropdownDefaultButton").removeClass('disabled');
                 $("#prompt").val(response['query'].trim());
                 $("#time-taken").text(response['time']);
                 $("#request-query").addClass('hidden');
@@ -119,7 +121,7 @@ for (let i = 0; i < liElements.length; i++) {
                 window.location.href = '/';
             }
             else if(response['status']==300){
-                console.log(response['msg']);
+                $("#samedb").removeClass('hidden');
             }
             else{
                 alert(response['msg']);
@@ -128,3 +130,6 @@ for (let i = 0; i < liElements.length; i++) {
     });
   });
 }
+$("#dropdownDefaultButton").click(function(){
+    $("#samedb").addClass('hidden');
+})

@@ -7,12 +7,8 @@
         <script src="https://cdn.tailwindcss.com"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style/output.css') }}">
-        <!-- Datatables css -->
         <link href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css" rel="stylesheet">
-        <!-- <link href="https://cdn.datatables.net/responsive/2.2.3/css/responsive.dataTables.min.css" rel="stylesheet"> -->
-        <!-- Custome Datatable CSS -->
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style/datatable.css') }}">
-        <!-- Datatables js -->
         <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
         <script src="https://cdn.datatables.net/responsive/2.2.3/js/dataTables.responsive.min.js"></script>
     </head>
@@ -30,7 +26,7 @@
                 </div>
                 <div class="grid gap-2 grid-cols-4 items-center justify-between border-t-2 border-neutral-100 py-2">
                     <h5 class="bg-group col-start-1 col-end-2 mb-1 text-xs font-bold tracking-tight text-teal-400">Tokens Utilized : {{gpt_metadata['tokens']}}</h5>
-                    <h5 class="bg-group col-start-4 col-end-5 mb-1 text-xs font-bold tracking-tight text-emerald-400">Time Taken (s) : {{gpt_metadata['time_taken']}}</h5>
+                    <h5 class="bg-group col-start-4 col-end-5 mb-1 text-xs font-bold tracking-tight text-emerald-400">Time Taken (m) : {{gpt_metadata['time_taken']}}</h5>
                 </div>
             </div>
             <div class="bg-group text-xs col-start-8 col-end-11 flex justify-center items-center">

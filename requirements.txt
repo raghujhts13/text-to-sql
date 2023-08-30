@@ -1,0 +1,7 @@
+ctransformers
+dotenv
+pygwalker
+pandas
+scipy
+sqlalchemy
+flask

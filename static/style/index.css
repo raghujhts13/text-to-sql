@@ -5,7 +5,7 @@
     border-radius: 5px;
 }
 input:focus {
-    outline: none !important; /* Remove the outline when input is focused */
+    outline: none !important; 
 }
 svg {
     position: fixed;
@@ -29,22 +29,17 @@ body, #filterInput, textarea{
     background-color: #FAF1E4;
 }
 nav, footer{
-    /* background-color: #f1d7b7; */
     background-color: #fcf7f0 !important;
 }
 th{
-    /* background-color: #435334; */
-    /* color: beige; */
     background-color: #d67c39;
     color: #1E293B;
 }
 tr{
-    /* background-color: #e4edda; */
     background-color: #e8bc89;
     color: #1E293B;
 }
 .checkbox, #masterCheckbox{
-    /* accent-color: #CEDEBD; */
     accent-color: #c7662f;
 }
 #dropdownDefaultButton{

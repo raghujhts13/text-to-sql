@@ -2,7 +2,6 @@ from flask import Flask, request, render_template, redirect, url_for, jsonify, s
 import os
 import sys
 import json
-import openai
 from dotenv import load_dotenv
 from dbconnection import dbactivities
 import pygwalker as pyg
@@ -12,7 +11,6 @@ import time
 
 nv_path = os.path.join(os.path.dirname(__file__), 'config', '.env')
 load_dotenv(dotenv_path=nv_path)
-openai.api_key = os.environ['OPENAI_KEY']
 
 app = Flask(__name__, template_folder='templates',static_folder='static')
 app.secret_key = os.environ['FLASK_KEY']
@@ -28,9 +26,8 @@ connectionstring = {'Database':os.environ['DB'],
                 'host':os.environ['HOST'],
                 'port':os.environ['PORT']}
 
-current_query = 'select * from SalesLT.Address'
+current_query = ''
 current_table = 'nothing'
-tokens_consumed = 0
 time_difference=0
 
 # FLASK APPLICATION
@@ -46,11 +43,12 @@ def index():
 def process_textarea():
     content = request.get_json()
     global current_query 
-    # current_query = "SELECT * FROM SalesLT.Customer;"
+    global tokens_consumed
     current_query, time_taken = llm_model.response_capturer(content['schema'],content['query'])
     global time_difference
-    time_difference = time_taken
+    time_difference = round(time_taken/60,3)
     return {'query':current_query, 'time':round(time_taken/60,3)}
+
 # function to change database
 @app.route('/change_db', methods=['POST'])
 def change_db():
@@ -66,6 +64,7 @@ def change_db():
             return {'status':200,'msg':'changed successfully'}
     except Exception as e:
         return {'status':600,'msg':e}
+    
 # function to clean the response
 @app.route('/clean_query', methods=['POST'])
 def clean_query():

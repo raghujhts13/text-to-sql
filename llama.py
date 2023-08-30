@@ -14,8 +14,8 @@ class llm:
         self.version = version
         self.llm = ''
         self.template = '''[INST] You are a professional SQL developer. Understand the question asked and return the most suitable query
-                            supported by SQLSERVER using the table : ""{schema}"". Always combine the schema name with table
-                            name when writing the query. Always wrap your code answer using ```. question: {prompt} [/INST]'''
+                            supported by SQLSERVER using the table : ""{schema}"". Always write sql server standard queries.
+                            Always wrap your code answer using ```. question: {prompt} [/INST]'''
     def load_model(self):
         try:
             if self.model and self.version:
@@ -41,12 +41,17 @@ class llm:
             template = self.template.replace("{schema}",schema).replace("{prompt}",prompt)
             if self.llm:
                 model = self.llm
+                print(model)
             else:
                  model = self.load_model()
+                 print(model)
                  if type(model)==str:
                      raise Exception(model)
             sql_query = model(template)
-            # sql_query = re.findall(r'```([\s\S]*?)```',sql_query, re.DOTALL)[0]
+            try:
+                sql_query = re.findall(r'```([\s\S]*?)```',sql_query, re.DOTALL)[0]
+            except:
+                pass
             end_time = time.time()
             return sql_query, (end_time-start_time)
         except Exception as e:
