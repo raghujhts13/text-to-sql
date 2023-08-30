@@ -46,8 +46,8 @@ def process_textarea():
     global tokens_consumed
     current_query, time_taken = llm_model.response_capturer(content['schema'],content['query'])
     global time_difference
-    time_difference = round(time_taken/60,3)
-    return {'query':current_query, 'time':round(time_taken/60,3)}
+    time_difference = round(time_taken/60,2)
+    return {'query':current_query, 'time':round(time_taken/60,2)}
 
 # function to change database
 @app.route('/change_db', methods=['POST'])
@@ -80,7 +80,7 @@ def output_page():
     current_table = table
     columns = list(table.keys())
     indices = list(table[columns[0]].keys())
-    return render_template('output.html', db_data=current_query, positions=indices, output=table, gpt_metadata={'tokens':tokens_consumed,'time_taken':time_difference})
+    return render_template('output.html', db_data=current_query, positions=indices, output=table, gpt_metadata={'tokens':0,'time_taken':time_difference})
 
 @app.route('/render_dashboard')
 def render_dashboard():
