@@ -5,3 +5,4 @@ pandas
 scipy
 sqlalchemy
 flask
+bitsandbytes
