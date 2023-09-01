@@ -36,6 +36,7 @@ def index():
     normalized_data = json.dumps(db_schema)
     normalized_data = json.loads(normalized_data)
     databases = dbcon.get_databases()
+    print(connectionstring)
     return render_template('index.html',json_data=normalized_data, db_data=connectionstring, dbs=databases)
 
 # function for llama
@@ -43,7 +44,6 @@ def index():
 def process_textarea():
     content = request.get_json()
     global current_query 
-    global tokens_consumed
     current_query, time_taken = llm_model.response_capturer(content['schema'],content['query'])
     global time_difference
     time_difference = round(time_taken/60,2)
@@ -54,11 +54,13 @@ def process_textarea():
 def change_db():
     content = request.get_json()
     db = content['database']
+    global connectionstring
     try:
-        if db==os.environ['DB']:
+        if db==connectionstring['Database']:
             return {'status':300,'msg':'no need to change'}
         else:
             dbcon.switch_db(db)
+            connectionstring['Database'] = db
             global db_schema
             db_schema = dbcon.index()
             return {'status':200,'msg':'changed successfully'}
