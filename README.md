@@ -33,7 +33,7 @@ You can replace this model with other models more suited to your hardware.
 ```bash
 
 # Clone the repository
-git  clone  https://github.com/yourusername/repo.git
+git  clone  https://github.com/raghujhts13/text-to-sql.git
 
 # change directory to where files are present
 cd text-to-sql
