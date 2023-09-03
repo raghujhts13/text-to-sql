@@ -53,7 +53,7 @@ If you are unable to do the above, check the command prompt to fetch the URL of 
 
 ## NOTE
 
-<u>You can change the model by altering the variable **llm_model ** inside the app.py file</u>. the first argument is the **model name** and the second argument is **version/ type**(second argument is not mandatory, so you can leave it empty if you are unsure about the version)
+<u>You can change the model by altering the variable **llm_model** inside the app.py file</u>. the first argument is the **model name** and the second argument is **version/ type**(second argument is not mandatory, so you can leave it empty if you are unsure about the version)
 <u>Example</u>
 I have downloaded the model from [TheBloke/CodeLlama-7B-Instruct-GGUF](https://huggingface.co/TheBloke/CodeLlama-7B-Instruct-GGUF) from Hugging Face. Inside this repository I have downloaded the **codellama-7b-instruct.Q5_K_M.gguf** model. Therefore, I have used the below arguments.
 ```bash
