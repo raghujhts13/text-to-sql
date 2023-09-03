@@ -1,8 +1,8 @@
-ctransformers
+ctransformers==0.2.24
+pygwalker==0.3.4
+pandas==2.0.3
+scipy==1.10.0
+sqlalchemy==1.4.39
+flask==2.2.2
+bitsandbytes==0.41.1
 dotenv
-pygwalker
-pandas
-scipy
-sqlalchemy
-flask
-bitsandbytes
